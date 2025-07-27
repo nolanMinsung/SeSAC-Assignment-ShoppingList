@@ -19,7 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        let rootNavigationController = UINavigationController(rootViewController: ViewController())
+        rootNavigationController.navigationBar.tintColor = .label
+        window?.rootViewController = rootNavigationController
         window?.makeKeyAndVisible()
     }
 
