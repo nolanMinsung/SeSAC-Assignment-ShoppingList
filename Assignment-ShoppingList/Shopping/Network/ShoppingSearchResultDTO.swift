@@ -31,5 +31,4 @@ struct ShoppingItemDTO: Decodable {
     let category2: String
     let category3: String
     let category4: String
-    
 }
