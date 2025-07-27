@@ -7,25 +7,16 @@
 
 import Foundation
 
-enum ShoppingItemError: LocalizedError {
-    case invalidURL
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            "제품 이미지 URL 형식이 올바르지 않습니다."
-        }
-    }
-}
-
 struct ShoppingItem {
     
     static func from(dto: ShoppingItemDTO) throws -> ShoppingItem {
-        guard let imageURL = URL(string: dto.image) else {
-            throw ShoppingItemError.invalidURL
+        let imageURL = URL(string: dto.image)
+        if imageURL == nil {
+            print("shoppingItem의 imageURL이 형식에 맞지 않습니다.")
         }
         return ShoppingItem(
-            title: dto.title,
+            title: dto.title.readHTML,
+            htmlTitle: dto.title.readHTMLToAttributed,
             image: imageURL,
             lprice: dto.lprice,
             mallName: dto.mallName,
@@ -33,9 +24,41 @@ struct ShoppingItem {
         )
     }
     
+    init(
+        title: String,
+        htmlTitle: NSAttributedString,
+        image: URL?,
+        lprice: Int,
+        mallName: String,
+        productId: Int
+    ) {
+        self.title = title.readHTML
+        self.htmlTitle = htmlTitle
+        self.image = image
+        self.lprice = lprice
+        self.mallName = mallName
+        self.productId = productId
+    }
+    
+    init(
+        title: String,
+        image: URL?,
+        lprice: Int,
+        mallName: String,
+        productId: Int
+    ) {
+        self.title = title.readHTML
+        self.htmlTitle = title.readHTMLToAttributed
+        self.image = image
+        self.lprice = lprice
+        self.mallName = mallName
+        self.productId = productId
+    }
+    
     let title: String
+    let htmlTitle: NSAttributedString
 //    let link: URL
-    let image: URL
+    let image: URL?
     let lprice: Int
 //    let hprice: Int
     let mallName: String

@@ -11,6 +11,114 @@ import SnapKit
 
 final class ShoppingSearchResultViewController: UIViewController {
     
+    let dummyShoppingList: [ShoppingItem] = [
+        .init(
+            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+            lprice: 79200000,
+            mallName: "친한사이 캠핑카",
+            productId: 86856240547
+        ),
+        .init(
+            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+            lprice: 1925000,
+            mallName: "잼 캠핑카",
+            productId: 88846533057
+        ),
+        .init(
+            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+            lprice: 169000,
+            mallName: "JUNIS Caravan",
+            productId: 11454289647
+        ),
+        .init(
+            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+            lprice: 79200000,
+            mallName: "친한사이 캠핑카",
+            productId: 86856240547
+        ),
+        .init(
+            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+            lprice: 1925000,
+            mallName: "잼 캠핑카",
+            productId: 88846533057
+        ),
+        .init(
+            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+            lprice: 169000,
+            mallName: "JUNIS Caravan",
+            productId: 11454289647
+        ),
+        .init(
+            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+            lprice: 79200000,
+            mallName: "친한사이 캠핑카",
+            productId: 86856240547
+        ),
+        .init(
+            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+            lprice: 1925000,
+            mallName: "잼 캠핑카",
+            productId: 88846533057
+        ),
+        .init(
+            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+            lprice: 169000,
+            mallName: "JUNIS Caravan",
+            productId: 11454289647
+        ),
+        .init(
+            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+            lprice: 79200000,
+            mallName: "친한사이 캠핑카",
+            productId: 86856240547
+        ),
+        .init(
+            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+            lprice: 1925000,
+            mallName: "잼 캠핑카",
+            productId: 88846533057
+        ),
+        .init(
+            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+            lprice: 169000,
+            mallName: "JUNIS Caravan",
+            productId: 11454289647
+        ),
+        .init(
+            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+            lprice: 79200000,
+            mallName: "친한사이 캠핑카",
+            productId: 86856240547
+        ),
+        .init(
+            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+            lprice: 1925000,
+            mallName: "잼 캠핑카",
+            productId: 88846533057
+        ),
+        .init(
+            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+            lprice: 169000,
+            mallName: "JUNIS Caravan",
+            productId: 11454289647
+        ),
+    ]
+    
     enum FilterCriterion: String, CaseIterable {
         case accuracy = "정확도"
         case date = "날짜순"
@@ -32,6 +140,7 @@ final class ShoppingSearchResultViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,6 +148,8 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDesign()
         setupViewHierarchy()
         setupLayout()
+        setupCollectionView()
+        setupDelegates()
         setupActions()
     }
     
@@ -48,9 +159,8 @@ final class ShoppingSearchResultViewController: UIViewController {
         flowLayout.minimumLineSpacing = 10
         flowLayout.minimumInteritemSpacing = 20
         flowLayout.sectionInset = .init(top: 10, left: 10, bottom: 10, right: 10)
-        flowLayout.itemSize = CGSize(width: view.bounds.width - 10, height: 100)
+        flowLayout.itemSize = CGSize(width: floor((UIScreen.main.bounds.width - 40)/2), height: 300)
         shoppingListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        shoppingListCollectionView.backgroundColor = .systemBlue
     }
     
     private func setupDesign() {
@@ -101,6 +211,18 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
     }
     
+    private func setupCollectionView() {
+        shoppingListCollectionView.register(
+            ShoppingItemCell.self,
+            forCellWithReuseIdentifier: ShoppingItemCell.reuseIdentifier
+        )
+    }
+    
+    private func setupDelegates() {
+        shoppingListCollectionView.dataSource = self
+        shoppingListCollectionView.delegate = self
+    }
+    
     private func setupActions() {
         filteringBadges.arrangedSubviews.forEach { subView in
             if let filteringButton = subView as? ShoppingListFilteringButton {
@@ -116,5 +238,28 @@ final class ShoppingSearchResultViewController: UIViewController {
             }
         }
     }
+    
+}
+
+
+extension ShoppingSearchResultViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return dummyShoppingList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let item = dummyShoppingList[indexPath.item]
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: ShoppingItemCell.reuseIdentifier,
+            for: indexPath
+        ) as! ShoppingItemCell
+        cell.configure(with: item)
+        return cell
+    }
+    
+}
+
+extension ShoppingSearchResultViewController: UICollectionViewDelegate {
     
 }
