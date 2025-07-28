@@ -11,115 +11,114 @@ import SnapKit
 
 final class ShoppingSearchResultViewController: UIViewController {
     
-    let dummyShoppingList: [ShoppingItem] = [
-        .init(
-            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-            lprice: 79200000,
-            mallName: "친한사이 캠핑카",
-            productId: 86856240547
-        ),
-        .init(
-            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-            lprice: 1925000,
-            mallName: "잼 캠핑카",
-            productId: 88846533057
-        ),
-        .init(
-            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-            lprice: 169000,
-            mallName: "JUNIS Caravan",
-            productId: 11454289647
-        ),
-        .init(
-            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-            lprice: 79200000,
-            mallName: "친한사이 캠핑카",
-            productId: 86856240547
-        ),
-        .init(
-            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-            lprice: 1925000,
-            mallName: "잼 캠핑카",
-            productId: 88846533057
-        ),
-        .init(
-            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-            lprice: 169000,
-            mallName: "JUNIS Caravan",
-            productId: 11454289647
-        ),
-        .init(
-            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-            lprice: 79200000,
-            mallName: "친한사이 캠핑카",
-            productId: 86856240547
-        ),
-        .init(
-            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-            lprice: 1925000,
-            mallName: "잼 캠핑카",
-            productId: 88846533057
-        ),
-        .init(
-            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-            lprice: 169000,
-            mallName: "JUNIS Caravan",
-            productId: 11454289647
-        ),
-        .init(
-            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-            lprice: 79200000,
-            mallName: "친한사이 캠핑카",
-            productId: 86856240547
-        ),
-        .init(
-            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-            lprice: 1925000,
-            mallName: "잼 캠핑카",
-            productId: 88846533057
-        ),
-        .init(
-            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-            lprice: 169000,
-            mallName: "JUNIS Caravan",
-            productId: 11454289647
-        ),
-        .init(
-            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-            lprice: 79200000,
-            mallName: "친한사이 캠핑카",
-            productId: 86856240547
-        ),
-        .init(
-            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-            lprice: 1925000,
-            mallName: "잼 캠핑카",
-            productId: 88846533057
-        ),
-        .init(
-            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-            lprice: 169000,
-            mallName: "JUNIS Caravan",
-            productId: 11454289647
-        ),
-    ]
+//    let dummyShoppingList: [ShoppingItem] = [
+//        .init(
+//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+//            lprice: 79200000,
+//            mallName: "친한사이 캠핑카",
+//            productId: 86856240547
+//        ),
+//        .init(
+//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+//            lprice: 1925000,
+//            mallName: "잼 캠핑카",
+//            productId: 88846533057
+//        ),
+//        .init(
+//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+//            lprice: 169000,
+//            mallName: "JUNIS Caravan",
+//            productId: 11454289647
+//        ),
+//        .init(
+//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+//            lprice: 79200000,
+//            mallName: "친한사이 캠핑카",
+//            productId: 86856240547
+//        ),
+//        .init(
+//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+//            lprice: 1925000,
+//            mallName: "잼 캠핑카",
+//            productId: 88846533057
+//        ),
+//        .init(
+//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+//            lprice: 169000,
+//            mallName: "JUNIS Caravan",
+//            productId: 11454289647
+//        ),
+//        .init(
+//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+//            lprice: 79200000,
+//            mallName: "친한사이 캠핑카",
+//            productId: 86856240547
+//        ),
+//        .init(
+//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+//            lprice: 1925000,
+//            mallName: "잼 캠핑카",
+//            productId: 88846533057
+//        ),
+//        .init(
+//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+//            lprice: 169000,
+//            mallName: "JUNIS Caravan",
+//            productId: 11454289647
+//        ),
+//        .init(
+//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+//            lprice: 79200000,
+//            mallName: "친한사이 캠핑카",
+//            productId: 86856240547
+//        ),
+//        .init(
+//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+//            lprice: 1925000,
+//            mallName: "잼 캠핑카",
+//            productId: 88846533057
+//        ),
+//        .init(
+//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+//            lprice: 169000,
+//            mallName: "JUNIS Caravan",
+//            productId: 11454289647
+//        ),
+//        .init(
+//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
+//            lprice: 79200000,
+//            mallName: "친한사이 캠핑카",
+//            productId: 86856240547
+//        ),
+//        .init(
+//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
+//            lprice: 1925000,
+//            mallName: "잼 캠핑카",
+//            productId: 88846533057
+//        ),
+//        .init(
+//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
+//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
+//            lprice: 169000,
+//            mallName: "JUNIS Caravan",
+//            productId: 11454289647
+//        ),
+//    ]
     var shoppingListDataSource: [ShoppingItem] = []
-    
     
     enum FilterCriterion: String, CaseIterable {
         case accuracy = "정확도"
@@ -154,7 +153,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        searchShoppingList(query: "캠핑카")
+        searchShoppingList(query: "모기장")
     }
     
     private func setupCollectionViewLayout() {
@@ -177,7 +176,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         
         resultCountLabel.textColor = .systemGreen
         resultCountLabel.font = .systemFont(ofSize: 13, weight: .semibold)
-        resultCountLabel.text = "13,235449개의 검색 결과"
+        resultCountLabel.text = "0개의 검색 결과"
         
         filteringBadges.axis = .horizontal
         filteringBadges.spacing = 10
@@ -248,14 +247,26 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
     }
     
-    private func searchShoppingList(query: String) {
-        ShoppingListNetworkService.shared.fetchShoppingList(query: query) { [weak self] result in
+    private func searchShoppingList(query: String, display: Int = 20) {
+        ShoppingListNetworkService.shared.fetchShoppingList(
+            query: query,
+            display: display
+        ) { [weak self] result in
             switch result {
-            case .success(let shoppintItems):
-                self?.shoppingListDataSource = shoppintItems
-                self?.shoppingListCollectionView.reloadData()
+            case .success(let resultDTO):
+                self?.resultCountLabel.text = "\(resultDTO.total.formatted())개의 검색 결과"
+                do {
+                    let shoppingItemsDTO = resultDTO.items
+                    let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
+                    self?.shoppingListDataSource = shoppingItems
+                    self?.shoppingListCollectionView.reloadData()
+                } catch {
+                    print(error.localizedDescription)
+                    self?.showAlert(message: error.localizedDescription)
+                }
             case .failure(let error):
                 print(error.localizedDescription)
+                self?.showAlert(message: error.localizedDescription)
             }
         }
     }
@@ -281,5 +292,17 @@ extension ShoppingSearchResultViewController: UICollectionViewDataSource {
 }
 
 extension ShoppingSearchResultViewController: UICollectionViewDelegate {
+    
+}
+
+
+extension ShoppingSearchResultViewController {
+    
+    private func showAlert(message: String) {
+        let alertController = UIAlertController(title: "오류 발생", message: message, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "확인", style: .cancel)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
+    }
     
 }

@@ -55,16 +55,12 @@ final class ShoppingListNetworkService {
     
     func fetchShoppingList(
         query: String,
-        display: Int = 100,
-        completion: @escaping (Result<[ShoppingItem], any Error>) -> Void
+        display: Int,
+        completion: @escaping (Result<ShoppingSearchResultDTO, any Error>) -> Void
     ) {
-        
         let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"
         let parameters: [String: Any] = ["query": query, "display": "\(display)"]
-        let headers = HTTPHeaders(
-            ["X-Naver-Client-Id": apiID,
-             "X-Naver-Client-Secret": apiKey]
-        )
+        let headers = HTTPHeaders(["X-Naver-Client-Id": apiID, "X-Naver-Client-Secret": apiKey])
         
         AF.request(
             baseUrlString,
@@ -74,13 +70,7 @@ final class ShoppingListNetworkService {
         ).responseDecodable(of: ShoppingSearchResultDTO.self) { response in
             switch response.result {
             case .success(let resultDTO):
-                let shoppingItemsDTO = resultDTO.items
-                do {
-                    let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
-                    completion(.success(shoppingItems))
-                } catch {
-                    completion(.failure(error))
-                }
+                completion(.success(resultDTO))
             case .failure(let error):
                 completion(.failure(error))
             }
