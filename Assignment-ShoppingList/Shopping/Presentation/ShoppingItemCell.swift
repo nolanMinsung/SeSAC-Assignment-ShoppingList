@@ -20,7 +20,13 @@ final class ShoppingItemCell: UICollectionViewCell {
     let mallNameLabel = UILabel()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
-    lazy var stackView = UIStackView(arrangedSubviews: [mallNameLabel, titleLabel, priceLabel,])
+    lazy var stackView = UIStackView(
+        arrangedSubviews: [
+            mallNameLabel,
+            titleLabel,
+            priceLabel,
+        ]
+    )
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -85,6 +91,8 @@ final class ShoppingItemCell: UICollectionViewCell {
             make.trailing.bottom.equalTo(imageView).inset(8)
             make.size.equalTo(40)
         }
+        
+        titleLabel.setContentCompressionResistancePriority(.init(749), for: .vertical)
         
         stackView.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(6)

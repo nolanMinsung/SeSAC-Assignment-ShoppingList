@@ -19,7 +19,7 @@ enum FilterCriterion: String, CaseIterable {
 final class ShoppingSearchResultViewController: UIViewController {
     
     let searchText: String
-    let numberOfInPage: Int = 20 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    let itemCountPerPage: Int = 20 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
     // start에 들어갈 숫자는 1 + (numberOfInPage x 페이지 번호)
     // 페이지 번호는 0, 1, 2, ...
     var page: Int = 0
@@ -57,7 +57,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        searchShoppingList(query: searchText, display: numberOfInPage)
+        searchShoppingList(query: searchText, display: itemCountPerPage)
     }
     
     private func setupCollectionViewLayout() {
@@ -154,6 +154,12 @@ final class ShoppingSearchResultViewController: UIViewController {
                 filteringButton.isSelected = (filteringButton === sender)
             }
         }
+        currentFilter = sender.sort
+        shoppingListDataSource.removeAll()
+        resultCountLabel.text = "0개의 검색 결과"
+        page = 0
+        isEnd = false
+        searchShoppingList(query: searchText, display: itemCountPerPage, sort: currentFilter)
     }
     
 }
@@ -167,7 +173,7 @@ extension ShoppingSearchResultViewController {
         ShoppingListNetworkService.shared.fetchShoppingList(
             query: query,
             display: display,
-            start: 1 + (numberOfInPage * page),
+            start: 1 + (itemCountPerPage * page),
             sort: sort
         ) { [weak self] result in
             guard let self else { return }
@@ -183,6 +189,10 @@ extension ShoppingSearchResultViewController {
                     self.shoppingListCollectionView.reloadData()
                     
                     isEnd = shoppingListDataSource.count >= resultDTO.total
+                    
+                    if page == 0 && shoppingListDataSource.count > 0 {
+                        shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
+                    }
                     
                 } catch {
                     print(error.localizedDescription)

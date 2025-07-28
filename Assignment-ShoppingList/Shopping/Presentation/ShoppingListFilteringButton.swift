@@ -21,12 +21,11 @@ final class ShoppingListFilteringButton: UIButton {
     init(sort: Sort) {
         self.sort = sort
         super.init(frame: .zero)
-        let title: String
-        switch sort {
-        case .sim: title = "정확도"
-        case .date: title = "날짜순"
-        case .asc: title = "가격높은순"
-        case .dsc: title = "가격낮은순"
+        let title: String = switch sort {
+        case .sim: "정확도"
+        case .date: "날짜순"
+        case .asc: "가격낮은순"
+        case .dsc: "가격높은순"
         }
         self.setTitle("  \(title)  ", for: .normal)
         self.titleLabel?.font = .systemFont(ofSize: 15)
