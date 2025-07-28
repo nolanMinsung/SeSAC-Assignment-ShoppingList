@@ -9,126 +9,26 @@ import UIKit
 
 import SnapKit
 
+enum FilterCriterion: String, CaseIterable {
+    case accuracy = "정확도"
+    case date = "날짜순"
+    case priceAscending = "가격높은순"
+    case priceDescending = "가격낮은순"
+}
+
 final class ShoppingSearchResultViewController: UIViewController {
     
     let searchText: String
-    let pageCount: Int = 15 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    let numberOfInPage: Int = 20 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    // start에 들어갈 숫자는 1 + (numberOfInPage x 페이지 번호)
+    // 페이지 번호는 0, 1, 2, ...
+    var page: Int = 0
+    var isEnd: Bool = false
+    var currentFilter: Sort = .sim
+    var isFetchingFromServer: Bool = false
     
-//    let dummyShoppingList: [ShoppingItem] = [
-//        .init(
-//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-//            lprice: 79200000,
-//            mallName: "친한사이 캠핑카",
-//            productId: 86856240547
-//        ),
-//        .init(
-//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-//            lprice: 1925000,
-//            mallName: "잼 캠핑카",
-//            productId: 88846533057
-//        ),
-//        .init(
-//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-//            lprice: 169000,
-//            mallName: "JUNIS Caravan",
-//            productId: 11454289647
-//        ),
-//        .init(
-//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-//            lprice: 79200000,
-//            mallName: "친한사이 캠핑카",
-//            productId: 86856240547
-//        ),
-//        .init(
-//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-//            lprice: 1925000,
-//            mallName: "잼 캠핑카",
-//            productId: 88846533057
-//        ),
-//        .init(
-//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-//            lprice: 169000,
-//            mallName: "JUNIS Caravan",
-//            productId: 11454289647
-//        ),
-//        .init(
-//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-//            lprice: 79200000,
-//            mallName: "친한사이 캠핑카",
-//            productId: 86856240547
-//        ),
-//        .init(
-//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-//            lprice: 1925000,
-//            mallName: "잼 캠핑카",
-//            productId: 88846533057
-//        ),
-//        .init(
-//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-//            lprice: 169000,
-//            mallName: "JUNIS Caravan",
-//            productId: 11454289647
-//        ),
-//        .init(
-//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-//            lprice: 79200000,
-//            mallName: "친한사이 캠핑카",
-//            productId: 86856240547
-//        ),
-//        .init(
-//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-//            lprice: 1925000,
-//            mallName: "잼 캠핑카",
-//            productId: 88846533057
-//        ),
-//        .init(
-//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-//            lprice: 169000,
-//            mallName: "JUNIS Caravan",
-//            productId: 11454289647
-//        ),
-//        .init(
-//            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8685624/86856240547.1.jpg"),
-//            lprice: 79200000,
-//            mallName: "친한사이 캠핑카",
-//            productId: 86856240547
-//        ),
-//        .init(
-//            title: "[SUV <b>캠핑카</b>] 컴팩트, 소형, 준중형 2인승 2인취침 <b>캠핑카</b> 구조변경 (침상, 테이블)",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_8884653/88846533057.1.jpg"),
-//            lprice: 1925000,
-//            mallName: "잼 캠핑카",
-//            productId: 88846533057
-//        ),
-//        .init(
-//            title: "<b>캠핑카</b> 카라반 툴레 피아마 어닝메쉬룸 주니스 어닝용모기장 구형295",
-//            image: .init(string: "https://shopping-phinf.pstatic.net/main_1145428/11454289647.3.jpg"),
-//            lprice: 169000,
-//            mallName: "JUNIS Caravan",
-//            productId: 11454289647
-//        ),
-//    ]
+    
     var shoppingListDataSource: [ShoppingItem] = []
-    
-    enum FilterCriterion: String, CaseIterable {
-        case accuracy = "정확도"
-        case date = "날짜순"
-        case priceAscending = "가격높은순"
-        case priceDescending = "가격낮은순"
-    }
     
     private let resultCountLabel = UILabel()
     private let filteringBadgesScrollView = UIScrollView()
@@ -157,7 +57,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        searchShoppingList(query: searchText)
+        searchShoppingList(query: searchText, display: numberOfInPage)
     }
     
     private func setupCollectionViewLayout() {
@@ -187,10 +87,14 @@ final class ShoppingSearchResultViewController: UIViewController {
         filteringBadges.alignment = .fill
         filteringBadges.distribution = .fill
         // 필터링 버튼들 추가
-        FilterCriterion.allCases
-            .map { $0.rawValue }
-            .map { ShoppingListFilteringButton(title: $0) }
+        Sort.allCases
+            .map { ShoppingListFilteringButton(sort: $0) }
             .forEach { filteringBadges.addArrangedSubview($0) }
+        
+        guard let filteringButton = filteringBadges.arrangedSubviews[0] as? ShoppingListFilteringButton else {
+            return
+        }
+        filteringButton.isSelected = true
     }
     
     private func setupViewHierarchy() {
@@ -243,7 +147,8 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
     }
     
-    @objc private func handleFilteringBadgeTapped(_ sender: UIButton) {
+    @objc private func handleFilteringBadgeTapped(_ sender: ShoppingListFilteringButton) {
+        // stackView 에 버튼들의 select 상태 반영
         filteringBadges.arrangedSubviews.forEach { subView in
             if let filteringButton = subView as? ShoppingListFilteringButton {
                 filteringButton.isSelected = (filteringButton === sender)
@@ -251,32 +156,49 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
     }
     
-    private func searchShoppingList(query: String, display: Int = 20) {
+}
+
+
+// MARK: - 네트워크 통신
+extension ShoppingSearchResultViewController {
+    
+    private func searchShoppingList(query: String, display: Int, sort: Sort = .sim) {
+        isFetchingFromServer = true
         ShoppingListNetworkService.shared.fetchShoppingList(
             query: query,
-            display: display
+            display: display,
+            start: 1 + (numberOfInPage * page),
+            sort: sort
         ) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let resultDTO):
-                self?.resultCountLabel.text = "\(resultDTO.total.formatted())개의 검색 결과"
+                if page == 0 {
+                    self.resultCountLabel.text = "\(resultDTO.total.formatted())개의 검색 결과"
+                }
                 do {
                     let shoppingItemsDTO = resultDTO.items
                     let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
-                    self?.shoppingListDataSource = shoppingItems
-                    self?.shoppingListCollectionView.reloadData()
+                    self.shoppingListDataSource.append(contentsOf: shoppingItems)
+                    self.shoppingListCollectionView.reloadData()
+                    
+                    isEnd = shoppingListDataSource.count >= resultDTO.total
+                    
                 } catch {
                     print(error.localizedDescription)
-                    self?.showAlert(message: error.localizedDescription)
+                    self.showAlert(message: error.localizedDescription)
                 }
             case .failure(let error):
                 print(error.localizedDescription)
-                self?.showAlert(message: error.localizedDescription)
+                self.showAlert(message: error.localizedDescription)
             }
+            isFetchingFromServer = false
         }
     }
 }
 
 
+// MARK: - UICollectionViewDataSource
 extension ShoppingSearchResultViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -295,7 +217,16 @@ extension ShoppingSearchResultViewController: UICollectionViewDataSource {
     
 }
 
+
+// MARK: - UICollectionViewDelegate
 extension ShoppingSearchResultViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if (indexPath.item == shoppingListDataSource.count - 4) && !isEnd && !isFetchingFromServer {
+            page += 1
+            searchShoppingList(query: searchText, display: 20, sort: currentFilter)
+        }
+    }
     
 }
 

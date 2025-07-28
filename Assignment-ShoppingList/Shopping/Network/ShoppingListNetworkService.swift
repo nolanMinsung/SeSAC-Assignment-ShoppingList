@@ -29,6 +29,13 @@ enum NetworkServiceError: LocalizedError {
     }
 }
 
+enum Sort: String, CaseIterable {
+    case sim
+    case date
+    case asc
+    case dsc
+}
+
 final class ShoppingListNetworkService {
     
     static let shared = try! ShoppingListNetworkService()
@@ -56,10 +63,17 @@ final class ShoppingListNetworkService {
     func fetchShoppingList(
         query: String,
         display: Int,
+        start: Int,
+        sort: Sort,
         completion: @escaping (Result<ShoppingSearchResultDTO, any Error>) -> Void
     ) {
         let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"
-        let parameters: [String: Any] = ["query": query, "display": "\(display)"]
+        let parameters: [String: Any] = [
+            "query": query,
+            "display": "\(display)",
+            "start": "\(start)",
+            "sort": sort.rawValue
+        ]
         let headers = HTTPHeaders(["X-Naver-Client-Id": apiID, "X-Naver-Client-Secret": apiKey])
         
         AF.request(
