@@ -20,11 +20,11 @@ struct ShoppingItemDTO: Decodable {
     let title: String
     let link: String
     let image: String
-    let lprice: Int
-    let hprice: Int
+    let lprice: String
+    let hprice: String
     let mallName: String
-    let productId: Int
-    let productType: Int
+    let productId: String
+    let productType: String
     let brand: String
     let maker: String
     let category1: String

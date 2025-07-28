@@ -1,0 +1,90 @@
+//
+//  ShoppingListNetworkService.swift
+//  Assignment-ShoppingList
+//
+//  Created by 김민성 on 7/28/25.
+//
+
+import Foundation
+
+import Alamofire
+
+enum NetworkServiceError: LocalizedError {
+    case infoPlistNotFound
+    case apiIDNotFound(id: String)
+    case apiKeyNotFound(key: String)
+    case responseValueNotFound
+    
+    var errorDescription: String? {
+        switch self {
+        case .infoPlistNotFound:
+            "info.plist 찾을 수 없음."
+        case .apiIDNotFound(let idName):
+            "info.plist에서 api id를 찾을 수 없음. id name: \(idName)"
+        case .apiKeyNotFound(let keyName):
+            "info.plist에서 api key를 찾을 수 없음. key name: \(keyName)"
+        case .responseValueNotFound:
+            "데이터 통신에는 성공했으나, 값이 비어있음."
+        }
+    }
+}
+
+final class ShoppingListNetworkService {
+    
+    static let shared = try! ShoppingListNetworkService()
+    
+    let apiID: String
+    let apiKey: String
+    
+    private init() throws {
+        guard let infoDictionary = Bundle.main.infoDictionary else {
+            throw NetworkServiceError.infoPlistNotFound
+        }
+        
+        guard let apiID = infoDictionary["NaverDevAPIID"] as? String else {
+            throw NetworkServiceError.apiIDNotFound(id: "NaverDevAPIID")
+        }
+        self.apiID = apiID
+        
+        guard let apiKey = infoDictionary["NaverDevAPIKEy"] as? String else {
+            throw NetworkServiceError.apiKeyNotFound(key: "NaverDevAPIKEy")
+        }
+        self.apiKey = apiKey
+    }
+    
+    
+    func fetchShoppingList(
+        query: String,
+        display: Int = 100,
+        completion: @escaping (Result<[ShoppingItem], any Error>) -> Void
+    ) {
+        
+        let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"
+        let parameters: [String: Any] = ["query": query, "display": "\(display)"]
+        let headers = HTTPHeaders(
+            ["X-Naver-Client-Id": apiID,
+             "X-Naver-Client-Secret": apiKey]
+        )
+        
+        AF.request(
+            baseUrlString,
+            method: .get,
+            parameters: parameters,
+            headers: headers
+        ).responseDecodable(of: ShoppingSearchResultDTO.self) { response in
+            switch response.result {
+            case .success(let resultDTO):
+                let shoppingItemsDTO = resultDTO.items
+                do {
+                    let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
+                    completion(.success(shoppingItems))
+                } catch {
+                    completion(.failure(error))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+}

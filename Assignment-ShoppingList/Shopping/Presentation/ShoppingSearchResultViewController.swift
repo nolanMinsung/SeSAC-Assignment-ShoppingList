@@ -118,6 +118,8 @@ final class ShoppingSearchResultViewController: UIViewController {
             productId: 11454289647
         ),
     ]
+    var shoppingListDataSource: [ShoppingItem] = []
+    
     
     enum FilterCriterion: String, CaseIterable {
         case accuracy = "정확도"
@@ -151,6 +153,8 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupCollectionView()
         setupDelegates()
         setupActions()
+        
+        searchShoppingList(query: "캠핑카")
     }
     
     private func setupCollectionViewLayout() {
@@ -159,7 +163,12 @@ final class ShoppingSearchResultViewController: UIViewController {
         flowLayout.minimumLineSpacing = 10
         flowLayout.minimumInteritemSpacing = 20
         flowLayout.sectionInset = .init(top: 10, left: 10, bottom: 10, right: 10)
-        flowLayout.itemSize = CGSize(width: floor((UIScreen.main.bounds.width - 40)/2), height: 300)
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            flowLayout.itemSize = CGSize(width: floor((UIScreen.main.bounds.width - 40)/2), height: 300)
+        } else {
+            flowLayout.itemSize = .init(width: 180, height: 300)
+        }
         shoppingListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
     }
     
@@ -239,17 +248,28 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
     }
     
+    private func searchShoppingList(query: String) {
+        ShoppingListNetworkService.shared.fetchShoppingList(query: query) { [weak self] result in
+            switch result {
+            case .success(let shoppintItems):
+                self?.shoppingListDataSource = shoppintItems
+                self?.shoppingListCollectionView.reloadData()
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
 
 
 extension ShoppingSearchResultViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dummyShoppingList.count
+        return shoppingListDataSource.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let item = dummyShoppingList[indexPath.item]
+        let item = shoppingListDataSource[indexPath.item]
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ShoppingItemCell.reuseIdentifier,
             for: indexPath

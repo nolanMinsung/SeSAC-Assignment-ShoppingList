@@ -18,9 +18,9 @@ struct ShoppingItem {
             title: dto.title.readHTML,
             htmlTitle: dto.title.readHTMLToAttributed,
             image: imageURL,
-            lprice: dto.lprice,
+            lprice: Int(dto.lprice)!,
             mallName: dto.mallName,
-            productId: dto.productId
+            productId: Int(dto.productId)!
         )
     }
     
