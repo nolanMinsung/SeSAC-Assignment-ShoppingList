@@ -42,7 +42,7 @@ class ViewController: UIViewController {
     }
     
     @objc private func shoppingButtonTapped(_ sender: UIButton) {
-        navigationController?.pushViewController(ShoppingSearchResultViewController(), animated: true)
+        navigationController?.pushViewController(ShoppingMainViewController(), animated: true)
     }
     
 }

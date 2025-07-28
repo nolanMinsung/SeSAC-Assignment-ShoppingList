@@ -11,6 +11,9 @@ import SnapKit
 
 final class ShoppingSearchResultViewController: UIViewController {
     
+    let searchText: String
+    let pageCount: Int = 15 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    
 //    let dummyShoppingList: [ShoppingItem] = [
 //        .init(
 //            title: "친한사이<b>캠핑카</b> Whale560L 풀옵션 <b>캠핑카</b> 모터홈 포터<b>캠핑카</b> 봉고<b>캠핑카</b>",
@@ -132,8 +135,9 @@ final class ShoppingSearchResultViewController: UIViewController {
     private let filteringBadges = UIStackView()
     private var shoppingListCollectionView: UICollectionView!
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    init(searchText: String) {
+        self.searchText = searchText
+        super.init(nibName: nil, bundle: nil)
         
         setupCollectionViewLayout()
     }
@@ -153,7 +157,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        searchShoppingList(query: "모기장")
+        searchShoppingList(query: searchText)
     }
     
     private func setupCollectionViewLayout() {

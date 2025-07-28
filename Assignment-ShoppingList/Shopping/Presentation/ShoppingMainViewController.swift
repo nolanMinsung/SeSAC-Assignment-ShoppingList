@@ -26,6 +26,19 @@ final class ShoppingMainViewController: UIViewController {
         searchBar.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
+        
+        searchBar.delegate = self
+    }
+    
+}
+
+
+extension ShoppingMainViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let trimmedText = searchBar.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+        let shoppingSearchResultVC = ShoppingSearchResultViewController(searchText: trimmedText)
+        navigationController?.pushViewController(shoppingSearchResultVC, animated: true)
     }
     
 }
