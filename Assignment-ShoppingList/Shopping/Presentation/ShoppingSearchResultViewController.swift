@@ -9,12 +9,6 @@ import UIKit
 
 import SnapKit
 
-enum FilterCriterion: String, CaseIterable {
-    case accuracy = "정확도"
-    case date = "날짜순"
-    case priceAscending = "가격높은순"
-    case priceDescending = "가격낮은순"
-}
 
 final class ShoppingSearchResultViewController: UIViewController {
     
@@ -24,7 +18,7 @@ final class ShoppingSearchResultViewController: UIViewController {
     // 페이지 번호는 0, 1, 2, ...
     private var page: Int = 0
     private var isEnd: Bool = false
-    private var currentFilter: Sort = .sim
+    private var currentFilter: SortingCriterion = .sim
     private var isFetchingFromServer: Bool = false
     
     
@@ -98,7 +92,7 @@ final class ShoppingSearchResultViewController: UIViewController {
 // MARK: - 네트워크 통신
 extension ShoppingSearchResultViewController {
     
-    private func searchShoppingList(query: String, display: Int, sort: Sort = .sim) {
+    private func searchShoppingList(query: String, display: Int, sort: SortingCriterion = .sim) {
         isFetchingFromServer = true
         ShoppingListNetworkService.shared.fetchShoppingList(
             query: query,

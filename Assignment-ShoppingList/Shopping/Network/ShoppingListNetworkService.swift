@@ -29,7 +29,10 @@ enum NetworkServiceError: LocalizedError {
     }
 }
 
-enum Sort: String, CaseIterable {
+// 처음에는 버튼에 보일 텍스트("정확도", "가격높은순" 등...) 를 rawValue로 하려고 했으나,
+// raw value는 서버 API의 query에 해당하는 값으로 구현.
+// -> 버튼에 보일 텍스트는 localizing 등에 따라 동적으로 변할 수 있기 때문...
+enum SortingCriterion: String, CaseIterable {
     case sim
     case date
     case asc
@@ -64,7 +67,7 @@ final class ShoppingListNetworkService {
         query: String,
         display: Int,
         start: Int,
-        sort: Sort,
+        sort: SortingCriterion,
         completion: @escaping (Result<ShoppingSearchResultDTO, any Error>) -> Void
     ) {
         let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"

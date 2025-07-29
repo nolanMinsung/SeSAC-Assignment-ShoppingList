@@ -62,7 +62,7 @@ private extension ShoppingSearchResultView {
         filteringBadges.alignment = .fill
         filteringBadges.distribution = .fill
         // 필터링 버튼들 추가
-        Sort.allCases
+        SortingCriterion.allCases
             .map { ShoppingListFilteringButton(sort: $0) }
             .forEach { filteringBadges.addArrangedSubview($0) }
         

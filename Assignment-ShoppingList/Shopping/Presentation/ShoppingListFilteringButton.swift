@@ -10,7 +10,7 @@ import UIKit
 
 final class ShoppingListFilteringButton: UIButton {
     
-    var sort: Sort
+    var sort: SortingCriterion
     
     override var isSelected: Bool {
         didSet {
@@ -18,7 +18,7 @@ final class ShoppingListFilteringButton: UIButton {
         }
     }
     
-    init(sort: Sort) {
+    init(sort: SortingCriterion) {
         self.sort = sort
         super.init(frame: .zero)
         let title: String = switch sort {
