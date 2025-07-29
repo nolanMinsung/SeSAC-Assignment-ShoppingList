@@ -72,6 +72,9 @@ final class ShoppingSearchResultViewController: UIViewController {
     }
     
     @objc private func handleFilteringBadgeTapped(_ sender: ShoppingListFilteringButton) {
+        // 필터 기준이 달라지는 경우만 서버에 재요청
+        guard sender.sort != currentFilter else { return }
+        
         // stackView 에 버튼들의 select 상태 반영
         filteringBadges.arrangedSubviews.forEach { subView in
             if let filteringButton = subView as? ShoppingListFilteringButton {
@@ -124,7 +127,7 @@ extension ShoppingSearchResultViewController {
             isEnd = shoppingListDataSource.count >= dto.total
             
             if page == 0 && shoppingListDataSource.count > 0 {
-                shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
+                shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
             }
             
         } catch {
