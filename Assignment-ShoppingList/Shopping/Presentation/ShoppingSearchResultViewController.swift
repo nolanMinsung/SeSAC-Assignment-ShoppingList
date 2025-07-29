@@ -21,11 +21,20 @@ final class ShoppingSearchResultViewController: UIViewController {
     private var currentFilter: SortingCriterion = .sim
     private var isFetchingFromServer: Bool = false
     
-    
     var shoppingListDataSource: [ShoppingItem] = []
+    var recommendedItemDataSource: [ShoppingItem] = [
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
+    ]
     
     let rootView = ShoppingSearchResultView()
     var shoppingListCollectionView: UICollectionView { rootView.shoppingListCollectionView }
+    var recommendedItemsCollectionView: UICollectionView { rootView.recommendedItemsCollectionView }
     var filteringBadges: UIStackView { rootView.filteringBadges }
     
     init(searchText: String) {
@@ -49,6 +58,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupActions()
         
         searchShoppingList(query: searchText, display: itemCountPerPage)
+        fetchRecommendedItems(query: "아이폰")
     }
     
     private func setupCollectionView() {
@@ -56,11 +66,19 @@ final class ShoppingSearchResultViewController: UIViewController {
             ShoppingItemCell.self,
             forCellWithReuseIdentifier: ShoppingItemCell.reuseIdentifier
         )
+        
+        recommendedItemsCollectionView.register(
+            RecommendedItemCell.self,
+            forCellWithReuseIdentifier: RecommendedItemCell.reuseIdentifier
+        )
     }
     
     private func setupDelegates() {
         shoppingListCollectionView.dataSource = self
         shoppingListCollectionView.delegate = self
+        
+        recommendedItemsCollectionView.dataSource = self
+        recommendedItemsCollectionView.delegate = self
     }
     
     private func setupActions() {
@@ -114,6 +132,23 @@ extension ShoppingSearchResultViewController {
         }
     }
     
+    private func fetchRecommendedItems(query: String) {
+        ShoppingListNetworkService.shared.fetchShoppingList(
+            query: query,
+            display: 20,
+            start: 1,
+            sort: SortingCriterion.sim
+        ) { [weak self] result in
+            switch result {
+            case .success(let resultDTO):
+                self?.handleFetchRecommendedDTO(resultDTO)
+            case .failure(let error):
+                print(error.localizedDescription)
+                self?.showAlert(message: error.localizedDescription)
+            }
+        }
+    }
+    
     private func handleFetchedDTO(_ dto: ShoppingSearchResultDTO) {
         if page == 0 {
             self.rootView.setResultCountText(dto.total)
@@ -136,6 +171,18 @@ extension ShoppingSearchResultViewController {
         }
     }
     
+    private func handleFetchRecommendedDTO(_ dto: ShoppingSearchResultDTO) {
+        do {
+            let shoppingItemsDTO = dto.items
+            let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
+            self.recommendedItemDataSource = shoppingItems
+            self.recommendedItemsCollectionView.reloadData()
+        } catch {
+            print(error.localizedDescription)
+            self.showAlert(message: error.localizedDescription)
+        }
+    }
+    
 }
 
 
@@ -143,17 +190,35 @@ extension ShoppingSearchResultViewController {
 extension ShoppingSearchResultViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return shoppingListDataSource.count
+        if collectionView == shoppingListCollectionView {
+            return shoppingListDataSource.count
+        } else {
+            return recommendedItemDataSource.count
+        }
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let item = shoppingListDataSource[indexPath.item]
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: ShoppingItemCell.reuseIdentifier,
-            for: indexPath
-        ) as! ShoppingItemCell
-        cell.configure(with: item)
-        return cell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        
+        if collectionView == shoppingListCollectionView {
+            let item = shoppingListDataSource[indexPath.item]
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ShoppingItemCell.reuseIdentifier,
+                for: indexPath
+            ) as! ShoppingItemCell
+            cell.configure(with: item)
+            return cell
+        } else {
+            let item = recommendedItemDataSource[indexPath.item]
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RecommendedItemCell.reuseIdentifier,
+                for: indexPath
+            ) as! RecommendedItemCell
+            cell.configure(with: item.image)
+            return cell
+        }
     }
     
 }

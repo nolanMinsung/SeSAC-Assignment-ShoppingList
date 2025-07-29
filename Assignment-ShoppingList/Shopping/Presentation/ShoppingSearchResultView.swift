@@ -14,6 +14,7 @@ final class ShoppingSearchResultView: UIView {
     private let filteringBadgesScrollView = UIScrollView()
     let filteringBadges = UIStackView()
     private(set) var shoppingListCollectionView: UICollectionView!
+    private(set) var recommendedItemsCollectionView: UICollectionView!
     
     
     override init(frame: CGRect) {
@@ -31,7 +32,6 @@ final class ShoppingSearchResultView: UIView {
     
 }
 
-//프로그래밍 스위프트 도구
 // Initial Settings
 private extension ShoppingSearchResultView {
     
@@ -48,6 +48,14 @@ private extension ShoppingSearchResultView {
             flowLayout.itemSize = .init(width: 180, height: 300)
         }
         shoppingListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        
+        let flowLayout2 = UICollectionViewFlowLayout()
+        flowLayout2.scrollDirection = .horizontal
+        flowLayout2.minimumLineSpacing = 10
+        flowLayout2.minimumInteritemSpacing = 10
+        flowLayout2.sectionInset = .init(top: 10, left: 10, bottom: 10, right: 10)
+        flowLayout2.itemSize = .init(width: 100, height: 100)
+        recommendedItemsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout2)
     }
     
     func setupDesign() {
@@ -77,6 +85,7 @@ private extension ShoppingSearchResultView {
         addSubview(filteringBadgesScrollView)
         filteringBadgesScrollView.addSubview(filteringBadges)
         addSubview(shoppingListCollectionView)
+        addSubview(recommendedItemsCollectionView)
     }
     
     func setupLayout() {
@@ -98,7 +107,14 @@ private extension ShoppingSearchResultView {
         
         shoppingListCollectionView.snp.makeConstraints { make in
             make.top.equalTo(filteringBadges.snp.bottom).offset(10)
-            make.horizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
+            make.horizontalEdges.equalTo(safeAreaLayoutGuide)
+            make.bottom.equalTo(recommendedItemsCollectionView.snp.top)
+        }
+        
+        recommendedItemsCollectionView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide)
+            make.height.equalTo(120)
         }
     }
     
