@@ -18,113 +18,43 @@ enum FilterCriterion: String, CaseIterable {
 
 final class ShoppingSearchResultViewController: UIViewController {
     
-    let searchText: String
-    let itemCountPerPage: Int = 20 // 상황에 따라 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    private let searchText: String
+    private let itemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
     // start에 들어갈 숫자는 1 + (numberOfInPage x 페이지 번호)
     // 페이지 번호는 0, 1, 2, ...
-    var page: Int = 0
-    var isEnd: Bool = false
-    var currentFilter: Sort = .sim
-    var isFetchingFromServer: Bool = false
+    private var page: Int = 0
+    private var isEnd: Bool = false
+    private var currentFilter: Sort = .sim
+    private var isFetchingFromServer: Bool = false
     
     
     var shoppingListDataSource: [ShoppingItem] = []
     
-    private let resultCountLabel = UILabel()
-    private let filteringBadgesScrollView = UIScrollView()
-    private let filteringBadges = UIStackView()
-    private var shoppingListCollectionView: UICollectionView!
+    let rootView = ShoppingSearchResultView()
+    var shoppingListCollectionView: UICollectionView { rootView.shoppingListCollectionView }
+    var filteringBadges: UIStackView { rootView.filteringBadges }
     
     init(searchText: String) {
         self.searchText = searchText
         super.init(nibName: nil, bundle: nil)
-        
-        setupCollectionViewLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+        view = rootView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupCollectionViewLayout()
-        setupDesign()
-        setupViewHierarchy()
-        setupLayout()
         setupCollectionView()
         setupDelegates()
         setupActions()
         
         searchShoppingList(query: searchText, display: itemCountPerPage)
-    }
-    
-    private func setupCollectionViewLayout() {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .vertical
-        flowLayout.minimumLineSpacing = 10
-        flowLayout.minimumInteritemSpacing = 20
-        flowLayout.sectionInset = .init(top: 10, left: 10, bottom: 10, right: 10)
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            flowLayout.itemSize = CGSize(width: floor((UIScreen.main.bounds.width - 40)/2), height: 300)
-        } else {
-            flowLayout.itemSize = .init(width: 180, height: 300)
-        }
-        shoppingListCollectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-    }
-    
-    private func setupDesign() {
-        view.backgroundColor = .systemBackground
-        
-        resultCountLabel.textColor = .systemGreen
-        resultCountLabel.font = .systemFont(ofSize: 13, weight: .semibold)
-        resultCountLabel.text = "0개의 검색 결과"
-        
-        filteringBadges.axis = .horizontal
-        filteringBadges.spacing = 10
-        filteringBadges.alignment = .fill
-        filteringBadges.distribution = .fill
-        // 필터링 버튼들 추가
-        Sort.allCases
-            .map { ShoppingListFilteringButton(sort: $0) }
-            .forEach { filteringBadges.addArrangedSubview($0) }
-        
-        guard let filteringButton = filteringBadges.arrangedSubviews[0] as? ShoppingListFilteringButton else {
-            return
-        }
-        filteringButton.isSelected = true
-    }
-    
-    private func setupViewHierarchy() {
-        view.addSubview(resultCountLabel)
-        view.addSubview(filteringBadgesScrollView)
-        filteringBadgesScrollView.addSubview(filteringBadges)
-        view.addSubview(shoppingListCollectionView)
-    }
-    
-    private func setupLayout() {
-        resultCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        filteringBadgesScrollView.snp.makeConstraints { make in
-            make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.height.equalTo(30)
-        }
-        
-        filteringBadges.snp.makeConstraints { make in
-            make.verticalEdges.equalTo(filteringBadgesScrollView.frameLayoutGuide)
-            make.horizontalEdges.equalTo(filteringBadgesScrollView.contentLayoutGuide)
-        }
-        
-        shoppingListCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(filteringBadges.snp.bottom).offset(10)
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
-        }
     }
     
     private func setupCollectionView() {
@@ -156,7 +86,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         }
         currentFilter = sender.sort
         shoppingListDataSource.removeAll()
-        resultCountLabel.text = "0개의 검색 결과"
+        rootView.setResultCountText(0)
         page = 0
         isEnd = false
         searchShoppingList(query: searchText, display: itemCountPerPage, sort: currentFilter)
@@ -176,35 +106,39 @@ extension ShoppingSearchResultViewController {
             start: 1 + (itemCountPerPage * page),
             sort: sort
         ) { [weak self] result in
-            guard let self else { return }
             switch result {
             case .success(let resultDTO):
-                if page == 0 {
-                    self.resultCountLabel.text = "\(resultDTO.total.formatted())개의 검색 결과"
-                }
-                do {
-                    let shoppingItemsDTO = resultDTO.items
-                    let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
-                    self.shoppingListDataSource.append(contentsOf: shoppingItems)
-                    self.shoppingListCollectionView.reloadData()
-                    
-                    isEnd = shoppingListDataSource.count >= resultDTO.total
-                    
-                    if page == 0 && shoppingListDataSource.count > 0 {
-                        shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
-                    }
-                    
-                } catch {
-                    print(error.localizedDescription)
-                    self.showAlert(message: error.localizedDescription)
-                }
+                self?.handleFetchedDTO(resultDTO)
             case .failure(let error):
                 print(error.localizedDescription)
-                self.showAlert(message: error.localizedDescription)
+                self?.showAlert(message: error.localizedDescription)
             }
-            isFetchingFromServer = false
+            self?.isFetchingFromServer = false
         }
     }
+    
+    private func handleFetchedDTO(_ dto: ShoppingSearchResultDTO) {
+        if page == 0 {
+            self.rootView.setResultCountText(dto.total)
+        }
+        do {
+            let shoppingItemsDTO = dto.items
+            let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
+            self.shoppingListDataSource.append(contentsOf: shoppingItems)
+            self.shoppingListCollectionView.reloadData()
+            
+            isEnd = shoppingListDataSource.count >= dto.total
+            
+            if page == 0 && shoppingListDataSource.count > 0 {
+                shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
+            }
+            
+        } catch {
+            print(error.localizedDescription)
+            self.showAlert(message: error.localizedDescription)
+        }
+    }
+    
 }
 
 
