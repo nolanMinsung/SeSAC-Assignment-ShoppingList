@@ -13,24 +13,27 @@ import SnapKit
 final class ShoppingSearchResultViewController: UIViewController {
     
     private let searchText: String
-    private let itemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    private let shoppingListItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    // start에 들어갈 숫자는 1 + (shoppingListItemCountPerPage x 페이지 번호)
+    // 페이지 번호는 0, 1, 2, ...
+    private var shoppingListPage: Int = 0
+    private var shoppingListIsEnd: Bool = false
+    private var currentFilter: SortingCriterion = .sim
+    private var shoppingListIsFetching: Bool = false
+    
+    // 추천 아이템들
+    
+    private let recommendedKeyword: String
+    private let recommendedItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
     // start에 들어갈 숫자는 1 + (numberOfInPage x 페이지 번호)
     // 페이지 번호는 0, 1, 2, ...
-    private var page: Int = 0
-    private var isEnd: Bool = false
-    private var currentFilter: SortingCriterion = .sim
-    private var isFetchingFromServer: Bool = false
+    private var recommendedItemPage: Int = 0
+    private var recommendedItemListIsEnd: Bool = false
+    private var recommendedItemListIsFetching: Bool = false
+    
     
     var shoppingListDataSource: [ShoppingItem] = []
-    var recommendedItemDataSource: [ShoppingItem] = [
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-        .init(title: "", htmlTitle: .init(string: ""), image: nil, lprice: 0, mallName: "", productId: 0),
-    ]
+    var recommendedItemDataSource: [ShoppingItem] = []
     
     let rootView = ShoppingSearchResultView()
     var shoppingListCollectionView: UICollectionView { rootView.shoppingListCollectionView }
@@ -39,6 +42,7 @@ final class ShoppingSearchResultViewController: UIViewController {
     
     init(searchText: String) {
         self.searchText = searchText
+        self.recommendedKeyword = "아이폰" // 일단 광고 키워드는 고정값으로..
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -57,8 +61,8 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        searchShoppingList(query: searchText, display: itemCountPerPage)
-        fetchRecommendedItems(query: "아이폰")
+        searchShoppingList(query: searchText, display: shoppingListItemCountPerPage)
+        fetchRecommendedItems()
     }
     
     private func setupCollectionView() {
@@ -102,9 +106,9 @@ final class ShoppingSearchResultViewController: UIViewController {
         currentFilter = sender.sort
         shoppingListDataSource.removeAll()
         rootView.setResultCountText(0)
-        page = 0
-        isEnd = false
-        searchShoppingList(query: searchText, display: itemCountPerPage, sort: currentFilter)
+        shoppingListPage = 0
+        shoppingListIsEnd = false
+        searchShoppingList(query: searchText, display: shoppingListItemCountPerPage, sort: currentFilter)
     }
     
 }
@@ -114,11 +118,11 @@ final class ShoppingSearchResultViewController: UIViewController {
 extension ShoppingSearchResultViewController {
     
     private func searchShoppingList(query: String, display: Int, sort: SortingCriterion = .sim) {
-        isFetchingFromServer = true
+        shoppingListIsFetching = true
         ShoppingListNetworkService.shared.fetchShoppingList(
             query: query,
             display: display,
-            start: 1 + (itemCountPerPage * page),
+            start: 1 + (shoppingListItemCountPerPage * shoppingListPage),
             sort: sort
         ) { [weak self] result in
             switch result {
@@ -128,13 +132,14 @@ extension ShoppingSearchResultViewController {
                 print(error.localizedDescription)
                 self?.showAlert(message: error.localizedDescription)
             }
-            self?.isFetchingFromServer = false
+            self?.shoppingListIsFetching = false
         }
     }
     
-    private func fetchRecommendedItems(query: String) {
+    private func fetchRecommendedItems() {
+        recommendedItemListIsFetching = true
         ShoppingListNetworkService.shared.fetchShoppingList(
-            query: query,
+            query: self.recommendedKeyword,
             display: 20,
             start: 1,
             sort: SortingCriterion.sim
@@ -146,11 +151,12 @@ extension ShoppingSearchResultViewController {
                 print(error.localizedDescription)
                 self?.showAlert(message: error.localizedDescription)
             }
+            self?.recommendedItemListIsFetching = false
         }
     }
     
     private func handleFetchedDTO(_ dto: ShoppingSearchResultDTO) {
-        if page == 0 {
+        if shoppingListPage == 0 {
             self.rootView.setResultCountText(dto.total)
         }
         do {
@@ -159,9 +165,9 @@ extension ShoppingSearchResultViewController {
             self.shoppingListDataSource.append(contentsOf: shoppingItems)
             self.shoppingListCollectionView.reloadData()
             
-            isEnd = shoppingListDataSource.count >= dto.total
+            shoppingListIsEnd = shoppingListDataSource.count >= dto.total
             
-            if page == 0 && shoppingListDataSource.count > 0 {
+            if shoppingListPage == 0 && shoppingListDataSource.count > 0 {
                 shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
             }
             
@@ -173,10 +179,17 @@ extension ShoppingSearchResultViewController {
     
     private func handleFetchRecommendedDTO(_ dto: ShoppingSearchResultDTO) {
         do {
-            let shoppingItemsDTO = dto.items
-            let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
-            self.recommendedItemDataSource = shoppingItems
+            let recommendedItemsDTO = dto.items
+            let recommendedItems = try recommendedItemsDTO.map { try ShoppingItem.from(dto: $0) }
+            self.recommendedItemDataSource.append(contentsOf: recommendedItems)
             self.recommendedItemsCollectionView.reloadData()
+            
+            recommendedItemListIsEnd = recommendedItemDataSource.count >= dto.total
+            
+            if recommendedItemPage == 0 && recommendedItemDataSource.count > 0 {
+                recommendedItemsCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
+            }
+            
         } catch {
             print(error.localizedDescription)
             self.showAlert(message: error.localizedDescription)
@@ -228,9 +241,17 @@ extension ShoppingSearchResultViewController: UICollectionViewDataSource {
 extension ShoppingSearchResultViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if (indexPath.item == shoppingListDataSource.count - 4) && !isEnd && !isFetchingFromServer {
-            page += 1
-            searchShoppingList(query: searchText, display: 20, sort: currentFilter)
+        
+        if collectionView == shoppingListCollectionView {
+            if (indexPath.item == shoppingListDataSource.count - 4) && !shoppingListIsEnd && !shoppingListIsFetching {
+                shoppingListPage += 1
+                searchShoppingList(query: searchText, display: 20, sort: currentFilter)
+            }
+        } else {
+            if (indexPath.item == recommendedItemDataSource.count - 4) && !recommendedItemListIsEnd && !recommendedItemListIsFetching {
+                recommendedItemPage += 1
+                fetchRecommendedItems()
+            }
         }
     }
     

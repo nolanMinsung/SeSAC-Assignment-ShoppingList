@@ -94,32 +94,4 @@ final class ShoppingListNetworkService {
         }
     }
     
-//    func fetchRecommendedItems(
-//        query: String,
-//        completion: @escaping (Result<ShoppingSearchResultDTO, any Error>) -> Void
-//    ) {
-//        let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"
-//        let parameters: [String: Any] = [
-//            "query": query,
-//            "display": 20,
-//            "start": 1,
-//            "sort": SortingCriterion.sim.rawValue
-//        ]
-//        let headers = HTTPHeaders(["X-Naver-Client-Id": apiID, "X-Naver-Client-Secret": apiKey])
-//        
-//        AF.request(
-//            baseUrlString,
-//            method: .get,
-//            parameters: parameters,
-//            headers: headers
-//        ).responseDecodable(of: ShoppingSearchResultDTO.self) { response in
-//            switch response.result {
-//            case .success(let resultDTO):
-//                completion(.success(resultDTO))
-//            case .failure(let error):
-//                completion(.failure(error))
-//            }
-//        }
-//    }
-    
 }
