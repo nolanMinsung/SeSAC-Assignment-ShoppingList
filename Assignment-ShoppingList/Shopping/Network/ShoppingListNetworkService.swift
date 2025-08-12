@@ -29,13 +29,15 @@ enum NetworkServiceError: LocalizedError {
     }
 }
 
-// 처음에는 버튼에 보일 텍스트("정확도", "가격높은순" 등...) 를 rawValue로 하려고 했으나,
-// raw value는 서버 API의 query에 해당하는 값으로 구현.
-// -> 버튼에 보일 텍스트는 localizing 등에 따라 동적으로 변할 수 있기 때문...
+// 각 case의 이름은 서버 API에서 요구하는 query 이름.
 enum SortingCriterion: String, CaseIterable {
+    /// 정확도순
     case sim
+    /// 날짜순
     case date
+    /// 가격낮은순
     case asc
+    /// 가격높은순
     case dsc
 }
 
