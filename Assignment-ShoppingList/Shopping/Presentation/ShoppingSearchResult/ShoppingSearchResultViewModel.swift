@@ -20,24 +20,24 @@ final class ShoppingSearchResultViewModel {
     
     // MARK: - 데이터 상태 저장
     
-    let searchText: String
-    let shoppingListItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    private let searchText: String
+    private let shoppingListItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
     // start에 들어갈 숫자는 1 + (shoppingListItemCountPerPage x 페이지 번호)
     // 페이지 번호는 0, 1, 2, ...
-    private(set) var shoppingListPage: Int = 0
-    private(set) var shoppingListIsEnd: Bool = false
-    private(set) var currentFilter: SortingCriterion = .sim
-    private(set) var shoppingListIsFetching: Bool = false
+    private var shoppingListPage: Int = 0
+    private var shoppingListIsEnd: Bool = false
+    private var currentFilter: SortingCriterion = .sim
+    private var shoppingListIsFetching: Bool = false
     
     // 추천 아이템들
     
-    let recommendedKeyword: String
-    let recommendedItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
+    private let recommendedKeyword: String
+    private let recommendedItemCountPerPage: Int = 15 // 상황에 따라 런타임 시점에 page 단위를 변경한다면 변수로 선언할 수도 있음.
     // start에 들어갈 숫자는 1 + (numberOfInPage x 페이지 번호)
     // 페이지 번호는 0, 1, 2, ...
-    private(set) var recommendedItemPage: Int = 0
-    private(set) var recommendedItemListIsEnd: Bool = false
-    private(set) var recommendedItemListIsFetching: Bool = false
+    private var recommendedItemPage: Int = 0
+    private var recommendedItemListIsEnd: Bool = false
+    private var recommendedItemListIsFetching: Bool = false
     
     private(set) var shoppingListDataSource: [ShoppingItem] = []
     private(set) var recommendedItemDataSource: [ShoppingItem] = []
@@ -117,7 +117,6 @@ extension ShoppingSearchResultViewModel {
             case .failure(let error):
                 print(error.localizedDescription)
                 self?.searchingErrorOutput.value = .alert(message: error.localizedDescription)
-//                self?.showAlert(message: error.localizedDescription)
             }
             self?.shoppingListIsFetching = false
         }
@@ -137,27 +136,21 @@ extension ShoppingSearchResultViewModel {
             case .failure(let error):
                 print(error.localizedDescription)
                 self?.searchingErrorOutput.value = .alert(message: error.localizedDescription)
-//                self?.showAlert(message: error.localizedDescription)
             }
             self?.recommendedItemListIsFetching = false
         }
     }
     
     private func handleFetchedDTO(_ dto: ShoppingSearchResultDTO) {
-//        if shoppingListPage == 0 {
-//            self.rootView.setResultCountText(dto.total)
-//        }
         do {
             let shoppingItemsDTO = dto.items
             let shoppingItems = try shoppingItemsDTO.map { try ShoppingItem.from(dto: $0) }
             self.shoppingListDataSource.append(contentsOf: shoppingItems)
-//            self.shoppingListCollectionView.reloadData()
             
             shoppingListIsEnd = shoppingListDataSource.count >= dto.total
             
             if shoppingListPage == 0 && shoppingListDataSource.count > 0 {
                 shoppingListUpdated.value = .reload(totalResultCount: dto.total)
-//                shoppingListCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
             } else {
                 shoppingListUpdated.value = .appendNew
             }
@@ -165,7 +158,6 @@ extension ShoppingSearchResultViewModel {
         } catch {
             print(error.localizedDescription)
             self.searchingErrorOutput.value = .alert(message: error.localizedDescription)
-//            self.showAlert(message: error.localizedDescription)
         }
     }
     
@@ -174,21 +166,17 @@ extension ShoppingSearchResultViewModel {
             let recommendedItemsDTO = dto.items
             let recommendedItems = try recommendedItemsDTO.map { try ShoppingItem.from(dto: $0) }
             self.recommendedItemDataSource.append(contentsOf: recommendedItems)
-//            self.recommendedItemsCollectionView.reloadData()
             
             recommendedItemListIsEnd = recommendedItemDataSource.count >= dto.total
             
             if recommendedItemPage == 0 && recommendedItemDataSource.count > 0 {
                 self.recommendedListUpdated.value = .reload(totalResultCount: dto.total)
-//                recommendedItemsCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
             } else {
                 self.recommendedListUpdated.value = .appendNew
             }
-            
         } catch {
             print(error.localizedDescription)
             self.searchingErrorOutput.value = .alert(message: error.localizedDescription)
-//            self.showAlert(message: error.localizedDescription)
         }
     }
     
