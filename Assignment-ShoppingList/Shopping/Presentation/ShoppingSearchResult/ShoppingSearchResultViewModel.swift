@@ -18,6 +18,26 @@ enum ErrorHandlingType {
 
 final class ShoppingSearchResultViewModel {
     
+    // MARK: - Input
+    
+    struct Input {
+        let filterButtonTapped = MSSubject<SortingCriterion>(value: .sim)
+        let shoppingListWillDisplay = MSSubject<IndexPath>(value: .init(item: 0, section: 0))
+        let recommendedItemWillDisplay = MSSubject<IndexPath>(value: .init(item: 0, section: 0))
+    }
+    
+    // MARK: - Output
+    
+    struct Output {
+        let sortingCriterionChanged = MSSubject<SortingCriterion>(value: .sim)
+        let shoppingListUpdated = MSSubject<SearchResultUpdateType>(value: .reload(totalResultCount: 0))
+        let recommendedListUpdated = MSSubject<SearchResultUpdateType>(value: .reload(totalResultCount: 0))
+        let searchingErrorOutput = MSSubject<ErrorHandlingType>(value: .alert(message: ""))
+    }
+    
+    let input: Input
+    let output: Output
+    
     // MARK: - 데이터 상태 저장
     
     private let searchText: String
@@ -42,40 +62,28 @@ final class ShoppingSearchResultViewModel {
     private(set) var shoppingListDataSource: [ShoppingItem] = []
     private(set) var recommendedItemDataSource: [ShoppingItem] = []
     
-    
-    // MARK: - Input Events
-    
-    let filterButtonTapped = MSSubject<SortingCriterion>(value: .sim)
-    let shoppingListWillDisplay = MSSubject<IndexPath>(value: .init(item: 0, section: 0))
-    let recommendedItemWillDisplay = MSSubject<IndexPath>(value: .init(item: 0, section: 0))
-    
-    // MARK: - Output Events
-    
-    let sortingCriterionChanged = MSSubject<SortingCriterion>(value: .sim)
-    let shoppingListUpdated = MSSubject<SearchResultUpdateType>(value: .reload(totalResultCount: 0))
-    let recommendedListUpdated = MSSubject<SearchResultUpdateType>(value: .reload(totalResultCount: 0))
-    let searchingErrorOutput = MSSubject<ErrorHandlingType>(value: .alert(message: ""))
-    
-    
     init(searchText: String, recommendedKeyword: String) {
+        self.input = Input()
+        self.output = Output()
+        
         self.searchText = searchText
         self.recommendedKeyword = recommendedKeyword
         
-        filterButtonTapped.subscribe { [weak self] criterion in
+        input.filterButtonTapped.subscribe { [weak self] criterion in
             guard let self else { return }
             // 필터 기준이 기존과 달라지는 경우만
             guard criterion != currentFilter else { return }
             
-            sortingCriterionChanged.value = criterion
+            output.sortingCriterionChanged.value = criterion
             currentFilter = criterion
             shoppingListDataSource.removeAll(keepingCapacity: true)
-            self.shoppingListUpdated.value = .reload(totalResultCount: 0)
+            self.output.shoppingListUpdated.value = .reload(totalResultCount: 0)
             shoppingListPage = 0
             shoppingListIsEnd = false
             searchShoppingList(query: searchText, display: shoppingListItemCountPerPage, sort: criterion)
         }
         
-        shoppingListWillDisplay.subscribe { [weak self] indexPath in
+        input.shoppingListWillDisplay.subscribe { [weak self] indexPath in
             guard let self else { return }
             
             if (indexPath.item == self.shoppingListDataSource.count - 4) && !self.shoppingListIsEnd && !self.shoppingListIsFetching {
@@ -84,7 +92,7 @@ final class ShoppingSearchResultViewModel {
             }
         }
         
-        recommendedItemWillDisplay.subscribe { [weak self] indexPath in
+        input.recommendedItemWillDisplay.subscribe { [weak self] indexPath in
             guard let self else { return }
             
             if (indexPath.item == self.recommendedItemDataSource.count - 4) && !self.recommendedItemListIsEnd && !self.recommendedItemListIsFetching {
@@ -116,7 +124,7 @@ extension ShoppingSearchResultViewModel {
                 self?.handleFetchedDTO(resultDTO)
             case .failure(let error):
                 print(error.localizedDescription)
-                self?.searchingErrorOutput.value = .alert(message: error.localizedDescription)
+                self?.output.searchingErrorOutput.value = .alert(message: error.localizedDescription)
             }
             self?.shoppingListIsFetching = false
         }
@@ -135,7 +143,7 @@ extension ShoppingSearchResultViewModel {
                 self?.handleFetchRecommendedDTO(resultDTO)
             case .failure(let error):
                 print(error.localizedDescription)
-                self?.searchingErrorOutput.value = .alert(message: error.localizedDescription)
+                self?.output.searchingErrorOutput.value = .alert(message: error.localizedDescription)
             }
             self?.recommendedItemListIsFetching = false
         }
@@ -150,14 +158,14 @@ extension ShoppingSearchResultViewModel {
             shoppingListIsEnd = shoppingListDataSource.count >= dto.total
             
             if shoppingListPage == 0 && shoppingListDataSource.count > 0 {
-                shoppingListUpdated.value = .reload(totalResultCount: dto.total)
+                output.shoppingListUpdated.value = .reload(totalResultCount: dto.total)
             } else {
-                shoppingListUpdated.value = .appendNew
+                output.shoppingListUpdated.value = .appendNew
             }
             
         } catch {
             print(error.localizedDescription)
-            self.searchingErrorOutput.value = .alert(message: error.localizedDescription)
+            self.output.searchingErrorOutput.value = .alert(message: error.localizedDescription)
         }
     }
     
@@ -170,13 +178,13 @@ extension ShoppingSearchResultViewModel {
             recommendedItemListIsEnd = recommendedItemDataSource.count >= dto.total
             
             if recommendedItemPage == 0 && recommendedItemDataSource.count > 0 {
-                self.recommendedListUpdated.value = .reload(totalResultCount: dto.total)
+                self.output.recommendedListUpdated.value = .reload(totalResultCount: dto.total)
             } else {
-                self.recommendedListUpdated.value = .appendNew
+                self.output.recommendedListUpdated.value = .appendNew
             }
         } catch {
             print(error.localizedDescription)
-            self.searchingErrorOutput.value = .alert(message: error.localizedDescription)
+            self.output.searchingErrorOutput.value = .alert(message: error.localizedDescription)
         }
     }
     

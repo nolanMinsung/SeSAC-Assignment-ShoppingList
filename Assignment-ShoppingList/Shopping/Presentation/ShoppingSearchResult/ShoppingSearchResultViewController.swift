@@ -13,8 +13,8 @@ import SnapKit
 final class ShoppingSearchResultViewController: UIViewController {
     
     private let viewModel: ShoppingSearchResultViewModel
-    
     private let rootView = ShoppingSearchResultView()
+    
     private var shoppingListCollectionView: UICollectionView { rootView.shoppingListCollectionView }
     private var recommendedItemsCollectionView: UICollectionView { rootView.recommendedItemsCollectionView }
     private var filteringBadges: UIStackView { rootView.filteringBadges }
@@ -40,7 +40,7 @@ final class ShoppingSearchResultViewController: UIViewController {
         setupDelegates()
         setupActions()
         
-        setupSubscriptions()
+        setupOutputActions()
     }
     
     private func setupCollectionView() {
@@ -72,11 +72,13 @@ final class ShoppingSearchResultViewController: UIViewController {
     }
     
     @objc private func handleFilteringBadgeTapped(_ sender: ShoppingListFilteringButton) {
-        viewModel.filterButtonTapped.value = sender.sort
+        viewModel.input.filterButtonTapped.value = sender.sort
     }
     
-    private func setupSubscriptions() {
-        viewModel.sortingCriterionChanged.subscribe { [weak self] criterion in
+    private func setupOutputActions() {
+        let output = viewModel.output
+        
+        output.sortingCriterionChanged.subscribe { [weak self] criterion in
             // stackView 에 버튼들의 select 상태 반영
             self?.filteringBadges.arrangedSubviews.forEach { subView in
                 if let filteringButton = subView as? ShoppingListFilteringButton {
@@ -86,7 +88,7 @@ final class ShoppingSearchResultViewController: UIViewController {
             self?.rootView.setResultCountText(0)
         }
         
-        viewModel.shoppingListUpdated.subscribe { [weak self] resultType in
+        output.shoppingListUpdated.subscribe { [weak self] resultType in
             switch resultType {
             case .appendNew:
                 break
@@ -96,7 +98,7 @@ final class ShoppingSearchResultViewController: UIViewController {
             self?.shoppingListCollectionView.reloadData()
         }
         
-        viewModel.recommendedListUpdated.subscribe { [weak self] _ in
+        output.recommendedListUpdated.subscribe { [weak self] _ in
             self?.recommendedItemsCollectionView.reloadData()
         }
     }
@@ -148,9 +150,9 @@ extension ShoppingSearchResultViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
         if collectionView == shoppingListCollectionView {
-            viewModel.shoppingListWillDisplay.value = indexPath
+            viewModel.input.shoppingListWillDisplay.value = indexPath
         } else {
-            viewModel.recommendedItemWillDisplay.value = indexPath
+            viewModel.input.recommendedItemWillDisplay.value = indexPath
         }
     }
     
