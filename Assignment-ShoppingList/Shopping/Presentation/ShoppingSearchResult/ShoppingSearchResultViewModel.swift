@@ -113,11 +113,12 @@ extension ShoppingSearchResultViewModel {
     
     private func searchShoppingList(query: String, display: Int, sort: SortingCriterion = .sim) {
         shoppingListIsFetching = true
-        ShoppingListNetworkService.shared.fetchShoppingList(
-            query: query,
-            display: display,
-            start: 1 + (shoppingListItemCountPerPage * shoppingListPage),
-            sort: sort
+        ShoppingListNetworkService.shared.searchShopping(
+            apiRouter: .shop(query: query,
+                             display: display,
+                             start: 1 + (shoppingListItemCountPerPage * shoppingListPage),
+                             sort: sort),
+            type: ShoppingSearchResultDTO.self
         ) { [weak self] result in
             switch result {
             case .success(let resultDTO):
@@ -132,11 +133,13 @@ extension ShoppingSearchResultViewModel {
     
     private func fetchRecommendedItems(display: Int) {
         recommendedItemListIsFetching = true
-        ShoppingListNetworkService.shared.fetchShoppingList(
-            query: self.recommendedKeyword,
-            display: display,
-            start: 1,
-            sort: SortingCriterion.sim
+        
+        ShoppingListNetworkService.shared.searchShopping(
+            apiRouter: .shop(query: self.recommendedKeyword,
+                             display: display,
+                             start: 1,
+                             sort: .sim),
+            type: ShoppingSearchResultDTO.self
         ) { [weak self] result in
             switch result {
             case .success(let resultDTO):

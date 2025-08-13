@@ -9,91 +9,40 @@ import Foundation
 
 import Alamofire
 
-enum NetworkServiceError: LocalizedError {
-    case infoPlistNotFound
-    case apiIDNotFound(id: String)
-    case apiKeyNotFound(key: String)
-    case responseValueNotFound
-    
-    var errorDescription: String? {
-        switch self {
-        case .infoPlistNotFound:
-            "info.plist 찾을 수 없음."
-        case .apiIDNotFound(let idName):
-            "info.plist에서 api id를 찾을 수 없음. id name: \(idName)"
-        case .apiKeyNotFound(let keyName):
-            "info.plist에서 api key를 찾을 수 없음. key name: \(keyName)"
-        case .responseValueNotFound:
-            "데이터 통신에는 성공했으나, 값이 비어있음."
-        }
-    }
-}
-
-// 각 case의 이름은 서버 API에서 요구하는 query 이름.
-enum SortingCriterion: String, CaseIterable {
-    /// 정확도순
-    case sim
-    /// 날짜순
-    case date
-    /// 가격낮은순
-    case asc
-    /// 가격높은순
-    case dsc
-}
-
 final class ShoppingListNetworkService {
     
-    static let shared = try! ShoppingListNetworkService()
+    static let shared = ShoppingListNetworkService()
+    private init() { }
     
-    let apiID: String
-    let apiKey: String
-    
-    private init() throws {
-        guard let infoDictionary = Bundle.main.infoDictionary else {
-            throw NetworkServiceError.infoPlistNotFound
-        }
-        
-        guard let apiID = infoDictionary["NaverDevAPIID"] as? String else {
-            throw NetworkServiceError.apiIDNotFound(id: "NaverDevAPIID")
-        }
-        self.apiID = apiID
-        
-        guard let apiKey = infoDictionary["NaverDevAPIKEy"] as? String else {
-            throw NetworkServiceError.apiKeyNotFound(key: "NaverDevAPIKEy")
-        }
-        self.apiKey = apiKey
-    }
-    
-    
-    func fetchShoppingList(
-        query: String,
-        display: Int,
-        start: Int,
-        sort: SortingCriterion,
-        completion: @escaping (Result<ShoppingSearchResultDTO, any Error>) -> Void
+    func searchShopping<T: Decodable>(
+        apiRouter: NaverOPENAPISearchRouter,
+        type: T.Type,
+        completion: @escaping (Result<T, any Error>) -> Void
     ) {
-        let baseUrlString = "https://openapi.naver.com/v1/search/shop.json"
-        let parameters: [String: Any] = [
-            "query": query,
-            "display": "\(display)",
-            "start": "\(start)",
-            "sort": sort.rawValue
-        ]
-        let headers = HTTPHeaders(["X-Naver-Client-Id": apiID, "X-Naver-Client-Secret": apiKey])
-        
-        AF.request(
-            baseUrlString,
-            method: .get,
-            parameters: parameters,
-            headers: headers
-        ).responseDecodable(of: ShoppingSearchResultDTO.self) { response in
-            switch response.result {
-            case .success(let resultDTO):
-                completion(.success(resultDTO))
-            case .failure(let error):
-                completion(.failure(error))
-            }
+        guard let url = URL(string: apiRouter.endpointString) else {
+            completion(.failure(NetworkServiceError.invalidEndpoint(apiRouter.endpointString)))
+            return
         }
+        
+        do {
+            let headers = try apiRouter.headers
+            AF.request(
+                url,
+                method: apiRouter.method,
+                parameters: apiRouter.parameter,
+                headers: headers
+            ).responseDecodable(of: T.self) { response in
+                switch response.result {
+                case .success(let resultDTO):
+                    completion(.success(resultDTO))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        } catch {
+            completion(.failure(error))
+        }
+        
     }
     
 }
